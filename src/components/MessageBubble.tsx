@@ -12,7 +12,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   
   return (
     <div className={`flex ${isHuman ? "justify-start" : "justify-end"} mb-3`}>
-      <div className={isHuman ? "message-human" : "message-ai"}>
+      <div className={`${isHuman ? "message-human" : "message-ai"} shadow-sm`}>
         <div className="mb-1">{message.content}</div>
         <div className="text-xs opacity-70 text-right">
           {format(message.timestamp, "HH:mm, MMM d")}

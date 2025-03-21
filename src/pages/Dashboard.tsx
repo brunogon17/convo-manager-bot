@@ -3,8 +3,33 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "@/components/Sidebar";
 import ChatArea from "@/components/ChatArea";
-import { Conversation } from "@/components/ConversationList";
+import { Conversation, Message } from "@/components/ConversationList";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+
+// Database configuration
+const DB_CONFIG = {
+  url: "http://teste.com",
+  port: 1234,
+  user: "admin",
+  password: "teste",
+  db_name: "db_empresa",
+  table_name: "tbl_n8n_conversas"
+};
+
+// Mock function to simulate database fetch
+const fetchConversationsFromDB = async (): Promise<Conversation[]> => {
+  console.log("Fetching conversations from DB:", DB_CONFIG);
+  
+  // In a real app, this would be a fetch to your database API
+  // For now, we'll return mock data with a simulated delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Simulate a successful database connection
+  toast.success("Connected to database successfully");
+  
+  return mockConversations;
+};
 
 // Mock data for conversations
 const mockConversations: Conversation[] = [
@@ -181,31 +206,68 @@ const mockConversations: Conversation[] = [
 ];
 
 const Dashboard = () => {
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/");
+    } else {
+      loadConversations();
     }
   }, [isAuthenticated, navigate]);
 
+  const loadConversations = async () => {
+    try {
+      setIsLoading(true);
+      const data = await fetchConversationsFromDB();
+      setConversations(data);
+      
+      // Set the first conversation as active if there's no active one
+      if (data.length > 0 && !activeConversation) {
+        setActiveConversation(data[0]);
+      } else if (activeConversation) {
+        // Update the active conversation with fresh data
+        const updatedActive = data.find(c => c.id === activeConversation.id);
+        if (updatedActive) {
+          setActiveConversation(updatedActive);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading conversations:", error);
+      toast.error("Failed to load conversations from database");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSelectConversation = (conversation: Conversation) => {
     setActiveConversation(conversation);
+  };
+
+  const handleRefreshConversation = () => {
+    loadConversations();
   };
 
   return (
     <div className="h-full flex overflow-hidden animate-fade-in">
       <div className="w-80 h-full">
         <Sidebar
-          conversations={mockConversations}
+          conversations={conversations}
           activeConversationId={activeConversation?.id || null}
           onSelectConversation={handleSelectConversation}
+          isLoading={isLoading}
+          onRefresh={handleRefreshConversation}
         />
       </div>
       <div className="flex-1 h-full">
-        <ChatArea conversation={activeConversation} />
+        <ChatArea 
+          conversation={activeConversation} 
+          onRefresh={handleRefreshConversation}
+        />
       </div>
     </div>
   );
