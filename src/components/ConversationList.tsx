@@ -35,8 +35,10 @@ const ConversationList: React.FC<ConversationListProps> = ({
       {conversations.map((conversation) => (
         <div
           key={conversation.id}
-          className={`sidebar-contact ${
-            activeConversationId === conversation.id ? "sidebar-contact-active" : ""
+          className={`sidebar-contact transition-colors duration-200 ${
+            activeConversationId === conversation.id 
+              ? "bg-primary/15 text-primary-foreground border-l-4 border-primary" 
+              : "hover:bg-accent/50"
           }`}
           onClick={() => onSelectConversation(conversation)}
         >
@@ -55,7 +57,9 @@ const ConversationList: React.FC<ConversationListProps> = ({
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex justify-between items-center">
-              <h3 className="font-medium truncate">{conversation.name}</h3>
+              <h3 className={`font-medium truncate ${activeConversationId === conversation.id ? "text-primary font-semibold" : ""}`}>
+                {conversation.name}
+              </h3>
               <span className="text-xs text-muted-foreground whitespace-nowrap ml-1">
                 {formatDistanceToNow(conversation.lastUpdate, { addSuffix: true })}
               </span>

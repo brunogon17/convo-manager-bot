@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
+import { Database } from "lucide-react";
 
 const Login = () => {
   const [username, setUsername] = useState<string>("");
@@ -38,9 +39,14 @@ const Login = () => {
       <div className="w-full max-w-md animate-fade-up">
         <Card className="glass-panel">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-3xl font-semibold tracking-tight">Sign in</CardTitle>
+            <div className="flex justify-center mb-2">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                <Database className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-3xl font-semibold tracking-tight">Gerenciador N8N</CardTitle>
             <CardDescription>
-              Enter your credentials to access your account
+              Faça login para acessar o gerenciador de conversas
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -48,7 +54,7 @@ const Login = () => {
               <div className="space-y-2">
                 <Input
                   id="username"
-                  placeholder="Username"
+                  placeholder="Usuário"
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -59,7 +65,7 @@ const Login = () => {
               <div className="space-y-2">
                 <Input
                   id="password"
-                  placeholder="Password"
+                  placeholder="Senha"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -68,7 +74,8 @@ const Login = () => {
                 />
               </div>
               <div className="text-xs text-muted-foreground">
-                Use username: <span className="font-semibold">admin</span> and password: <span className="font-semibold">admin</span>
+                <div className="mb-1">Banco de dados: <span className="font-semibold">db_empresa</span> (PostgreSQL)</div>
+                <div>Use usuário: <span className="font-semibold">admin</span> e senha: <span className="font-semibold">admin</span></div>
               </div>
             </CardContent>
             <CardFooter>
@@ -80,10 +87,10 @@ const Login = () => {
                 {isLoading ? (
                   <span className="flex items-center gap-2">
                     <span className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                    Signing in...
+                    Verificando credenciais...
                   </span>
                 ) : (
-                  "Sign in"
+                  "Entrar"
                 )}
               </Button>
             </CardFooter>

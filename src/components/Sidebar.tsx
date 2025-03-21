@@ -22,7 +22,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onRefresh,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   const filteredConversations = conversations.filter((conversation) =>
     conversation.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -37,19 +37,19 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <div className="flex flex-col h-full border-r bg-sidebar">
       <div className="flex items-center justify-between p-4 border-b">
-        <h2 className="text-lg font-semibold">Conversations</h2>
+        <h2 className="text-lg font-semibold">Conversas</h2>
         <div className="flex gap-2">
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={handleRefresh}
             disabled={isLoading}
-            title="Refresh conversations"
+            title="Atualizar conversas"
           >
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
           <Button variant="ghost" size="sm" onClick={logout}>
-            Logout
+            Sair
           </Button>
         </div>
       </div>
@@ -58,7 +58,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
-            placeholder="Search contacts..."
+            placeholder="Buscar contatos..."
             className="pl-9"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -71,7 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div className="flex items-center justify-center h-full">
             <div className="flex flex-col items-center">
               <RefreshCw className="h-8 w-8 animate-spin text-primary mb-2" />
-              <p className="text-sm text-muted-foreground">Loading conversations...</p>
+              <p className="text-sm text-muted-foreground">Carregando conversas...</p>
             </div>
           </div>
         ) : (

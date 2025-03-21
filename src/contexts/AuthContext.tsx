@@ -2,13 +2,10 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-
-type User = {
-  username: string;
-};
+import { authenticateUser, UserData } from "@/services/database";
 
 type AuthContextType = {
-  user: User | null;
+  user: UserData | null;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
@@ -17,7 +14,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserData | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -35,22 +32,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (username: string, password: string): Promise<boolean> => {
-    // Simulating an API call with a slight delay
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if (username === "admin" && password === "admin") {
-          const user = { username };
-          setUser(user);
-          setIsAuthenticated(true);
-          localStorage.setItem("user", JSON.stringify(user));
-          toast.success("Login successful");
-          resolve(true);
-        } else {
-          toast.error("Invalid credentials");
-          resolve(false);
-        }
-      }, 500);
-    });
+    try {
+      const user = await authenticateUser(username, password);
+      
+      if (user) {
+        setUser(user);
+        setIsAuthenticated(true);
+        localStorage.setItem("user", JSON.stringify(user));
+        toast.success("Login realizado com sucesso");
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error("Error during login:", error);
+      toast.error("Erro ao realizar login");
+      return false;
+    }
   };
 
   const logout = () => {
@@ -58,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAuthenticated(false);
     localStorage.removeItem("user");
     navigate("/");
-    toast.info("Logged out successfully");
+    toast.info("Sessão encerrada");
   };
 
   return (
