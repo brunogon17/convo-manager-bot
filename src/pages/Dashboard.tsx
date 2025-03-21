@@ -27,15 +27,27 @@ const Dashboard = () => {
   const loadConversations = async () => {
     try {
       setIsLoading(true);
+      // Fetch data and ensure it has the correct types by mapping the sender to the expected union type
       const data = await fetchConversationsFromDB();
-      setConversations(data);
+      
+      // Ensure the type of 'sender' is correct ('human' | 'ai')
+      const typedData: Conversation[] = data.map(conversation => ({
+        ...conversation,
+        messages: conversation.messages.map(message => ({
+          ...message,
+          // Cast sender to the expected union type
+          sender: message.sender as "human" | "ai"
+        }))
+      }));
+      
+      setConversations(typedData);
       
       // Set the first conversation as active if there's no active one
-      if (data.length > 0 && !activeConversation) {
-        setActiveConversation(data[0]);
+      if (typedData.length > 0 && !activeConversation) {
+        setActiveConversation(typedData[0]);
       } else if (activeConversation) {
         // Update the active conversation with fresh data
-        const updatedActive = data.find(c => c.id === activeConversation.id);
+        const updatedActive = typedData.find(c => c.id === activeConversation.id);
         if (updatedActive) {
           setActiveConversation(updatedActive);
         }
